@@ -19,6 +19,11 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
     console.log(`a user connected, ${socket.id}`);
 
+    socket.on("join", ({ username, room }) => {
+        console.log(`${username} joined ${room}`);
+        socket.join(room);
+    });
+
     socket.on("disconnect", () => {
         console.log(`a user disconnected, ${socket.id}`);
     });
@@ -27,9 +32,4 @@ io.on("connection", (socket) => {
 
 server.listen(port, () => {
     console.log(`listening on *:${port}`);
-}
-);
-
-app.get("/", (req, res) => {
-    
 });
