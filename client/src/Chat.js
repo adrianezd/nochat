@@ -2,13 +2,30 @@ import React from "react";
 import Header from "./Header";
 
 function Chat({ socket, username, room }) {
-  const [messages, setMessages] = React.useState([]);
   const [message, setMessage] = React.useState("");
+  const [messages, setMessages] = React.useState([]);
 
-  const sendMessage = () => {
-    socket.emit("message", message);
-    setMessages([...messages, { username, message }]);
+  const sendMessage = async () => {
+    if (message === "") return;
+    const time = new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes();
+    const newMessage = { user: username, message: message, room: room, time:time, id: messages.length };
+    
+    await socket.emit("new_message", newMessage);
+    setMessages((messages) => [...messages, newMessage]);
+    setMessage("");
   };
+
+  React.useEffect(() => {
+    const receiveMessage = (data) => {
+      setMessages((messages) => [...messages, data]);
+    };
+
+    socket.on("receive_message", receiveMessage);
+    
+    return () => {
+      socket.off("receive_message", receiveMessage);
+    };
+  }, [socket]);
 
   return (
     <div>
@@ -23,8 +40,10 @@ function Chat({ socket, username, room }) {
       <div className="chat-messages">
         {messages.map((message, index) => (
           <div key={index}>
-            <h3>{message.username}</h3>
+            <h5>{message.time}</h5>
+            <h3>{message.user}</h3>
             <p>{message.message}</p>
+            <h6>-----------------</h6>
           </div>
         ))}
       </div>
