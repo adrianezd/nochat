@@ -4,17 +4,24 @@ import Header from "./Header";
 function Chat({ socket, username, room }) {
   const [message, setMessage] = React.useState();
   const [messages, setMessages] = React.useState([]);
+  const [optionChat, setOptionChat] = React.useState("no-chat");
 
   const sendMessage = async () => {
     if (message === "") return;
-    const time = new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes();
-    const newMessage = { user: username, message: message, room: room, time:time, id: messages.length };
-    
+    const time =
+      new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes();
+    const newMessage = {
+      user: username,
+      message: message,
+      room: room,
+      time: time,
+      id: messages.length,
+    };
+
     await socket.emit("new_message", newMessage);
     setMessages((messages) => [...messages, newMessage]);
     setMessage("");
   };
-
 
   React.useEffect(() => {
     const receiveMessage = (data) => {
@@ -22,20 +29,33 @@ function Chat({ socket, username, room }) {
     };
 
     socket.on("receive_message", receiveMessage);
-    
+
     return () => {
       socket.off("receive_message", receiveMessage);
     };
   }, [socket]);
 
+const changeChatMode = () => {
+  var selectBox = document.getElementById("option-selected");
+  //get value of selected option from select box
+  console.log(selectBox.value);
+  //setOptionChat(selectedValue);
+};
+  
+  React.useEffect(() => {
+    alert("Chat mode changed to " + optionChat);
+  }, [optionChat]);
+
+  
+
+
   return (
     <div>
-    {
-        
-      <div className="chat-header">
-        <Header username={username} room={room} />
-      </div>
-}
+      {
+        <div className="chat-header">
+          <Header username={username} room={room} />
+        </div>
+      }
       <div className="chat-title">
         <h1>No chat in this room...</h1>
       </div>
@@ -60,16 +80,16 @@ function Chat({ socket, username, room }) {
         <button onClick={() => sendMessage()}>Send</button>
       </div>
 
-          <div className="chat-counter-delete">
-            <div>
-              <select>
-              <option value="no-remove">Don't remove messages</option>
-                <option value="20-seconds">20 seconds to remove</option>
-                <option value="10-seconds">10 messages to remove</option>
-              </select>
-            </div>
-          </div>
-
+      <div className="chat-counter-delete">
+        <div>
+          <select id="option-selected" onChange={changeChatMode} 
+           >
+            <option value="no-remove">Don't remove messages</option>
+            <option value="20-seconds">20 seconds to remove</option>
+            <option value="10-messages">10 messages to remove</option>
+          </select>
+        </div>
+      </div>
     </div>
   );
 }
