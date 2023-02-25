@@ -2,7 +2,7 @@ import React from "react";
 import Header from "./Header";
 
 function Chat({ socket, username, room }) {
-  const [message, setMessage] = React.useState("");
+  const [message, setMessage] = React.useState();
   const [messages, setMessages] = React.useState([]);
 
   const sendMessage = async () => {

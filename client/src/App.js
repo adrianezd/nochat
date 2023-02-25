@@ -7,12 +7,14 @@ const socket = io.connect('http://localhost:3001');
 
 
 function App() {
-  const [username,setUsername]  = useState("");
+  const [username,setUsername]  = useState("User" + Math.floor(Math.random() * 1000));
   const [room,setRoom] = useState("");
 
   const joinRoom = () => {
     socket.emit('join', {username,room});
   }
+
+
 
   return (
     <div className="App">
