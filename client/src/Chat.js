@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useContext, createContext } from "react";
 import Header from "./Header";
+import { UserContext } from "./Context";
 
 function Chat({ socket, username, room }) {
   const [message, setMessage] = React.useState();
   const [messages, setMessages] = React.useState([]);
+  const roomActive = useContext(UserContext);
+
 
   const sendMessage = async () => {
     if (message === "") return;
@@ -29,13 +32,18 @@ function Chat({ socket, username, room }) {
 
   return (
     <div>
-      <div className="chat-header">
+    {
+      roomActive ? (
+        <div className="chat-header">
         <Header username={username} room={room} />
       </div>
-
-      <div className="chat-title">
+      ) : (
+        <div className="chat-title">
         <h1>No chat in this room...</h1>
       </div>
+      )
+
+    }
 
       <div className="chat-messages">
         {messages.map((message, index) => (
