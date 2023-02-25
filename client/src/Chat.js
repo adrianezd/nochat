@@ -1,12 +1,14 @@
 import React from "react";
 import Header from "./Header";
 
-function Chat({ socket, username, room }) {
+function Chat({ socket, username, room, exitChat  }) {
   const [message, setMessage] = React.useState();
   const [messages, setMessages] = React.useState([]);
   const [optionChat, setOptionChat] = React.useState("no-remove");
   const [hasSelectedOption, setHasSelectedOption] = React.useState(true);
   const [selectedOption, setSelectedOption] = React.useState("no-remove");
+
+  
 
   const sendMessage = async () => {
     if (message === "") return;
@@ -91,6 +93,11 @@ function Chat({ socket, username, room }) {
     }
   }, [selectedOption]);
 
+  const disconnectChat = () => {
+    socket.emit("exit_chat", { username: username, room: room });
+    exitChat();
+  };
+
   return (
     <div>
       {
@@ -134,6 +141,13 @@ function Chat({ socket, username, room }) {
           </select>
         </div>
       </div>
+
+      <div className="exit-chat">
+        <button onClick={disconnectChat}>
+          Exit
+        </button>
+      </div>  
+
     </div>
   );
 }

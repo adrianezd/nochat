@@ -16,6 +16,11 @@ function App() {
     setRoomActive(true);
   }
 
+  const exitChat = () => {
+    socket.emit("exit_chat", { username: username, room: room });
+    setRoomActive(false);
+  };
+
   return (
     
     <div className="App">
@@ -25,7 +30,7 @@ function App() {
         <input type="text" placeholder="Room" required value={room} onChange={(e) => setRoom(e.target.value)} />
         <button onClick={() => joinRoom()}>Join</button>
         {
-          roomActive ? <Chat socket={socket} username={username} room={room} /> : null
+          roomActive ? <Chat exitChat={exitChat} socket={socket} username={username} room={room} /> : null
         }
       </div>
       
