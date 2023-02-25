@@ -5,6 +5,7 @@ function Chat({ socket, username, room }) {
   const [message, setMessage] = React.useState();
   const [messages, setMessages] = React.useState([]);
   const [optionChat, setOptionChat] = React.useState("no-chat");
+  const [hasSelectedOption, setHasSelectedOption] = React.useState(false);
 
   const sendMessage = async () => {
     if (message === "") return;
@@ -35,19 +36,17 @@ function Chat({ socket, username, room }) {
     };
   }, [socket]);
 
-const changeChatMode = () => {
-  var selectBox = document.getElementById("option-selected");
-  //get value of selected option from select box
-  console.log(selectBox.value);
-  //setOptionChat(selectedValue);
-};
-  
+  const changeChatMode = () => {
+    var selectBox = document.getElementById("option-selected");
+    setOptionChat(selectBox.value);
+    setHasSelectedOption(true);
+  };
+
   React.useEffect(() => {
-    alert("Chat mode changed to " + optionChat);
-  }, [optionChat]);
-
-  
-
+    if (hasSelectedOption) {
+      alert("Chat mode changed to " + optionChat);
+    }
+  }, [hasSelectedOption, optionChat]);
 
   return (
     <div>
@@ -82,8 +81,7 @@ const changeChatMode = () => {
 
       <div className="chat-counter-delete">
         <div>
-          <select id="option-selected" onChange={changeChatMode} 
-           >
+          <select id="option-selected" onChange={changeChatMode}>
             <option value="no-remove">Don't remove messages</option>
             <option value="20-seconds">20 seconds to remove</option>
             <option value="10-messages">10 messages to remove</option>
@@ -93,5 +91,6 @@ const changeChatMode = () => {
     </div>
   );
 }
+
 
 export default Chat;
