@@ -1,12 +1,9 @@
-import React, { useContext, createContext } from "react";
+import React from "react";
 import Header from "./Header";
-import { UserContext } from "./Context";
 
 function Chat({ socket, username, room }) {
   const [message, setMessage] = React.useState();
   const [messages, setMessages] = React.useState([]);
-  const roomActive = useContext(UserContext);
-
 
   const sendMessage = async () => {
     if (message === "") return;
@@ -17,6 +14,7 @@ function Chat({ socket, username, room }) {
     setMessages((messages) => [...messages, newMessage]);
     setMessage("");
   };
+
 
   React.useEffect(() => {
     const receiveMessage = (data) => {
@@ -33,17 +31,14 @@ function Chat({ socket, username, room }) {
   return (
     <div>
     {
-      roomActive ? (
-        <div className="chat-header">
+        
+      <div className="chat-header">
         <Header username={username} room={room} />
       </div>
-      ) : (
-        <div className="chat-title">
+}
+      <div className="chat-title">
         <h1>No chat in this room...</h1>
       </div>
-      )
-
-    }
 
       <div className="chat-messages">
         {messages.map((message, index) => (
@@ -64,6 +59,17 @@ function Chat({ socket, username, room }) {
         />
         <button onClick={() => sendMessage()}>Send</button>
       </div>
+
+          <div className="chat-counter-delete">
+            <div>
+              <select>
+              <option value="no-remove">Don't remove messages</option>
+                <option value="20-seconds">20 seconds to remove</option>
+                <option value="10-seconds">10 messages to remove</option>
+              </select>
+            </div>
+          </div>
+
     </div>
   );
 }
