@@ -1,14 +1,12 @@
 import React from "react";
 import Header from "./Header";
 
-function Chat({ socket, username, room, exitChat  }) {
+function Chat({ socket, username, room, exitChat }) {
   const [message, setMessage] = React.useState();
   const [messages, setMessages] = React.useState([]);
   const [optionChat, setOptionChat] = React.useState("no-remove");
   const [hasSelectedOption, setHasSelectedOption] = React.useState(true);
   const [selectedOption, setSelectedOption] = React.useState("no-remove");
-
-  
 
   const sendMessage = async () => {
     if (message === "") return;
@@ -25,6 +23,7 @@ function Chat({ socket, username, room, exitChat  }) {
     await socket.emit("new_message", newMessage);
     setMessages((messages) => [...messages, newMessage]);
   };
+
   React.useEffect(() => {
     const receiveMessage = (data) => {
       setMessages((messages) => [...messages, data]);
@@ -65,15 +64,24 @@ function Chat({ socket, username, room, exitChat  }) {
       const selectOption = document.getElementById("option-selected");
       selectOption.value = optionChat;
 
-
       if (optionChat === "20-seconds") {
         setTimeout(() => {
           setMessages([]);
         }, 20000);
       }
+
+      if (optionChat === "10-messages") {
+        if (messages.length > 10) {
+          setMessages(messages.slice(1));
+        }
+      }
+
+      if (optionChat === "no-remove") {
+        setMessages(messages);
+      }
     }
   }, [hasSelectedOption, optionChat]);
-
+  
 
   React.useEffect(() => {
     if (hasSelectedOption) {
@@ -143,11 +151,8 @@ function Chat({ socket, username, room, exitChat  }) {
       </div>
 
       <div className="exit-chat">
-        <button onClick={disconnectChat}>
-          Exit
-        </button>
-      </div>  
-
+        <button onClick={disconnectChat}>Exit</button>
+      </div>
     </div>
   );
 }
