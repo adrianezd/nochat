@@ -10,8 +10,8 @@ function Chat({ socket, username, room, exitChat }) {
 
   const sendMessage = async () => {
     if (message === "") return;
-    const time =
-      new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes();
+    const time = new Date(Date.now()).getHours() + ":" + (new Date(Date.now()).getMinutes() < 10 ? "0" + new Date(Date.now()).getMinutes() : new Date(Date.now()).getMinutes());
+      
     const newMessage = {
       user: username,
       message: message,
@@ -19,6 +19,7 @@ function Chat({ socket, username, room, exitChat }) {
       time: time,
       id: messages.length,
     };
+
     const selectOption = document.getElementById("message-input");
     selectOption.value = "";
     setMessage("");
