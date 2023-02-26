@@ -19,6 +19,8 @@ function Chat({ socket, username, room, exitChat }) {
       time: time,
       id: messages.length,
     };
+    const selectOption = document.getElementById("message-input");
+    selectOption.value = "";
     setMessage("");
     await socket.emit("new_message", newMessage);
     setMessages((messages) => [...messages, newMessage]);
@@ -50,7 +52,6 @@ function Chat({ socket, username, room, exitChat }) {
 
   const changeChatMode = async (event) => {
     const chatMode = event.target.value;
-    console.log(chatMode, "change chat mode");
     setOptionChat(chatMode);
     setSelectedOption(chatMode);
     setHasSelectedOption(true);
@@ -60,7 +61,6 @@ function Chat({ socket, username, room, exitChat }) {
 
   React.useEffect(() => {
     if (hasSelectedOption) {
-      console.log(optionChat, "change chat mode penultimo  use effect");
       const selectOption = document.getElementById("option-selected");
       selectOption.value = optionChat;
 
@@ -133,6 +133,7 @@ function Chat({ socket, username, room, exitChat }) {
           type="text"
           placeholder="Message"
           onChange={(event) => setMessage(event.target.value)}
+          id = "message-input"
         />
         <button onClick={() => sendMessage()}>Send</button>
       </div>
