@@ -1,14 +1,14 @@
 import React from "react";
 import Header from "./Header";
-import EmojiPicker from "emoji-picker-react";
+import Picker from 'emoji-picker-react';
 
 function Chat({ socket, username, room, exitChat }) {
-  const [message, setMessage] = React.useState("");
+  const [message, setMessage] = React.useState('');
   const [messages, setMessages] = React.useState([]);
   const [optionChat, setOptionChat] = React.useState("no-remove");
   const [hasSelectedOption, setHasSelectedOption] = React.useState(true);
   const [selectedOption, setSelectedOption] = React.useState("no-remove");
-  const [emojiPicker, setEmojiPicker] = React.useState(false);
+  const [showPicker, setShowPicker] = React.useState(false);
 
   const sendMessage = async () => {
     if (message === "") return;
@@ -113,20 +113,10 @@ function Chat({ socket, username, room, exitChat }) {
     exitChat();
   };
 
-  const emojiPickerOn = () => {
-    setEmojiPicker(true);
-  };
 
-  const addEmoji = (event, emojiObject) => {
-    const selectOption = document.getElementById("message-input");
-    const newMessage = selectOption.value + emojiObject.emoji;
-    selectOption.value = newMessage;
-    setMessage(newMessage);
-    setEmojiPicker(false);
-  };
-
-  const handleImageError = (event) => {
-    event.target.style.display = "none"; 
+  const onEmojiClick = (event, emojiObject) => {
+    setMessage(message => message + emojiObject.emoji);
+    setShowPicker(false);
   };
 
   return (
@@ -151,27 +141,24 @@ function Chat({ socket, username, room, exitChat }) {
         ))}
       </div>
 
-      <div className="chat-send">
+      <div className="chat-send">        
+         <div className="picker-container">
         <input
-          type="text"
-          placeholder="Message"
-          onChange={(event) => setMessage(event.target.value)}
+          className="input-style"
           value={message}
-          id="message-input"
+        onChange={(event) => setMessage(event.target.value)}
+        placeholder="Message"
+        id="message-input"
         />
-        <button onClick={() => emojiPickerOn()}>Open Emoji Picker</button>
-        {emojiPicker ? (
-          <div className="emoji-picker">
-            <EmojiPicker onEmojiClick={addEmoji} />
-            <img
-              src="https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/2642-fe0f.png"
-              onError={handleImageError}
-              alt=""
-            />
-          </div>
-        ) : null}
-        <button onClick={() => sendMessage()}>Send</button>
+        <img
+          className="emoji-icon"
+          src="https://icons.getbootstrap.com/assets/icons/emoji-smile.svg"
+          onClick={() => setShowPicker(val => !val)} />
+        {showPicker && <Picker
+          onEmojiClick={onEmojiClick} />}
+          <button onClick={() => sendMessage()}>Send</button>
       </div>
+    </div>
 
       <div className="chat-counter-delete">
         <div>
