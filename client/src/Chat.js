@@ -1,5 +1,6 @@
 import React from "react";
 import Header from "./Header";
+import EmojiPicker from 'emoji-picker-react';
 
 function Chat({ socket, username, room, exitChat }) {
   const [message, setMessage] = React.useState();
@@ -7,6 +8,7 @@ function Chat({ socket, username, room, exitChat }) {
   const [optionChat, setOptionChat] = React.useState("no-remove");
   const [hasSelectedOption, setHasSelectedOption] = React.useState(true);
   const [selectedOption, setSelectedOption] = React.useState("no-remove");
+  const [emojiPicker, setEmojiPicker] = React.useState(false);
 
   const sendMessage = async () => {
     if (message === "") return;
@@ -107,6 +109,10 @@ function Chat({ socket, username, room, exitChat }) {
     exitChat();
   };
 
+  const emojiPickerOn = () => {
+    setEmojiPicker(true);
+  }
+
   return (
     <div>
       {
@@ -136,6 +142,12 @@ function Chat({ socket, username, room, exitChat }) {
           onChange={(event) => setMessage(event.target.value)}
           id = "message-input"
         />
+        <button onClick={() => emojiPickerOn()}>
+          Open Emoji Picker
+        </button>
+        {
+            emojiPicker ? <EmojiPicker /> : null
+          }
         <button onClick={() => sendMessage()}>Send</button>
       </div>
 
