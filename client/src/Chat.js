@@ -1,9 +1,9 @@
 import React from "react";
 import Header from "./Header";
-import EmojiPicker from 'emoji-picker-react';
+import EmojiPicker from "emoji-picker-react";
 
 function Chat({ socket, username, room, exitChat }) {
-  const [message, setMessage] = React.useState();
+  const [message, setMessage] = React.useState("");
   const [messages, setMessages] = React.useState([]);
   const [optionChat, setOptionChat] = React.useState("no-remove");
   const [hasSelectedOption, setHasSelectedOption] = React.useState(true);
@@ -12,8 +12,13 @@ function Chat({ socket, username, room, exitChat }) {
 
   const sendMessage = async () => {
     if (message === "") return;
-    const time = new Date(Date.now()).getHours() + ":" + (new Date(Date.now()).getMinutes() < 10 ? "0" + new Date(Date.now()).getMinutes() : new Date(Date.now()).getMinutes());
-      
+    const time =
+      new Date(Date.now()).getHours() +
+      ":" +
+      (new Date(Date.now()).getMinutes() < 10
+        ? "0" + new Date(Date.now()).getMinutes()
+        : new Date(Date.now()).getMinutes());
+
     const newMessage = {
       user: username,
       message: message,
@@ -84,7 +89,6 @@ function Chat({ socket, username, room, exitChat }) {
       }
     }
   }, [hasSelectedOption, optionChat]);
-  
 
   React.useEffect(() => {
     if (hasSelectedOption) {
@@ -111,7 +115,19 @@ function Chat({ socket, username, room, exitChat }) {
 
   const emojiPickerOn = () => {
     setEmojiPicker(true);
-  }
+  };
+
+  const addEmoji = (event, emojiObject) => {
+    const selectOption = document.getElementById("message-input");
+    const newMessage = selectOption.value + emojiObject.emoji;
+    selectOption.value = newMessage;
+    setMessage(newMessage);
+    setEmojiPicker(false);
+  };
+
+  const handleImageError = (event) => {
+    event.target.style.display = "none"; 
+  };
 
   return (
     <div>
@@ -140,14 +156,20 @@ function Chat({ socket, username, room, exitChat }) {
           type="text"
           placeholder="Message"
           onChange={(event) => setMessage(event.target.value)}
-          id = "message-input"
+          value={message}
+          id="message-input"
         />
-        <button onClick={() => emojiPickerOn()}>
-          Open Emoji Picker
-        </button>
-        {
-            emojiPicker ? <EmojiPicker /> : null
-          }
+        <button onClick={() => emojiPickerOn()}>Open Emoji Picker</button>
+        {emojiPicker ? (
+          <div className="emoji-picker">
+            <EmojiPicker onEmojiClick={addEmoji} />
+            <img
+              src="https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/2642-fe0f.png"
+              onError={handleImageError}
+              alt=""
+            />
+          </div>
+        ) : null}
         <button onClick={() => sendMessage()}>Send</button>
       </div>
 
