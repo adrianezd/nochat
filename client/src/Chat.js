@@ -1,7 +1,6 @@
 import React from "react";
 import Header from "./Header";
 import Picker from 'emoji-picker-react';
-import CounterDelete from "./components/CounterDelete/CounterDelete";
 
 function Chat({ socket, username, room, exitChat }) {
   const [message, setMessage] = React.useState('');
@@ -161,8 +160,17 @@ function Chat({ socket, username, room, exitChat }) {
       </div>
     </div>
 
-    <div className="chat-counter-delete">
-        <CounterDelete optionChat={optionChat} changeChatMode={changeChatMode} />
+      <div className="chat-counter-delete">
+        <div>
+          <select
+            id="option-selected"
+            onChange={(event) => changeChatMode(event)}
+          >
+            <option value="no-remove">Don't remove messages</option>
+            <option value="20-seconds">20 seconds to remove</option>
+            <option value="10-messages">10 messages to remove</option>
+          </select>
+        </div>
       </div>
 
       <div className="exit-chat">
