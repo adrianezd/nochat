@@ -5,9 +5,7 @@ import Picker from 'emoji-picker-react';
 function Chat({ socket, username, room, exitChat }) {
   const [message, setMessage] = React.useState('');
   const [messages, setMessages] = React.useState(() => {
-    const messagesCookie = document.cookie
-      .split('; ')
-      .find(row => row.startsWith('chatMessages='))
+    const messagesCookie = document.cookie.split('; ').find(row => row.startsWith('chatMessages='))
     if (messagesCookie) {
       return JSON.parse(messagesCookie.split('=')[1]);
     } else {
@@ -42,8 +40,28 @@ function Chat({ socket, username, room, exitChat }) {
     await socket.emit("new_message", newMessage);
     setMessages((messages) => [...messages, newMessage]);
     document.cookie = `chatMessages=${JSON.stringify(messages)}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/`;
-    
   };
+
+  const disconnectChat = () => {
+    socket.emit("exit_chat", { username: username, room: room });
+    exitChat();
+  };
+
+
+  const onEmojiClick = (event, emojiObject) => {
+    setMessage(message => message + emojiObject.emoji);
+    setShowPicker(false);
+  };
+
+  const changeChatMode = async (event) => {
+    const chatMode = event.target.value;
+    setOptionChat(chatMode);
+    setSelectedOption(chatMode);
+    setHasSelectedOption(true);
+    await socket.emit("change_chat_mode", { room: room, chatMode: chatMode });
+    await socket.emit("update_selected_option", chatMode);
+  };
+
 
   React.useEffect(() => {
     const receiveMessage = (data) => {
@@ -69,14 +87,13 @@ function Chat({ socket, username, room, exitChat }) {
     };
   }, [socket]);
 
-  const changeChatMode = async (event) => {
-    const chatMode = event.target.value;
-    setOptionChat(chatMode);
-    setSelectedOption(chatMode);
-    setHasSelectedOption(true);
-    await socket.emit("change_chat_mode", { room: room, chatMode: chatMode });
-    await socket.emit("update_selected_option", chatMode);
-  };
+  React.useEffect(() => {
+    const messagesExpirationDate = new Date(Date.now() + 1000 * 60 * 60 * 24 * 7); // 7 days from now
+    document.cookie = `chatMessages=${JSON.stringify(messages)}; expires=${messagesExpirationDate.toUTCString()}; path=/`;
+    document.cookie = `username=${username}; expires=${messagesExpirationDate.toUTCString()}; path=/`;
+    document.cookie = `room=${room}; expires=${messagesExpirationDate.toUTCString()}; path=/`;
+    document.cookie = `optionChat=${optionChat}; expires=${messagesExpirationDate.toUTCString()}; path=/`;
+  }, [messages, username, room, optionChat]);
 
   React.useEffect(() => {
     if (hasSelectedOption) {
@@ -119,16 +136,6 @@ function Chat({ socket, username, room, exitChat }) {
     }
   }, [selectedOption]);
 
-  const disconnectChat = () => {
-    socket.emit("exit_chat", { username: username, room: room });
-    exitChat();
-  };
-
-
-  const onEmojiClick = (event, emojiObject) => {
-    setMessage(message => message + emojiObject.emoji);
-    setShowPicker(false);
-  };
 
   return (
     <div>
