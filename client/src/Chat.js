@@ -4,7 +4,16 @@ import Picker from 'emoji-picker-react';
 
 function Chat({ socket, username, room, exitChat }) {
   const [message, setMessage] = React.useState('');
-  const [messages, setMessages] = React.useState([]);
+  const [messages, setMessages] = React.useState(() => {
+    const messagesCookie = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('chatMessages='))
+    if (messagesCookie) {
+      return JSON.parse(messagesCookie.split('=')[1]);
+    } else {
+      return [];
+    }
+  });
   const [optionChat, setOptionChat] = React.useState("no-remove");
   const [hasSelectedOption, setHasSelectedOption] = React.useState(true);
   const [selectedOption, setSelectedOption] = React.useState("no-remove");
@@ -32,6 +41,8 @@ function Chat({ socket, username, room, exitChat }) {
     setMessage("");
     await socket.emit("new_message", newMessage);
     setMessages((messages) => [...messages, newMessage]);
+    document.cookie = `chatMessages=${JSON.stringify(messages)}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/`;
+    
   };
 
   React.useEffect(() => {
