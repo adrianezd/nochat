@@ -5,15 +5,19 @@ import Picker from 'emoji-picker-react';
 function Chat({ socket, username, room, exitChat }) {
   const [message, setMessage] = React.useState('');
   const [messages, setMessages] = React.useState(() => {
+    console.log("messages cookie", document.cookie);
     const messagesCookie = document.cookie
-      .split('; ')
-      .find(row => row.startsWith('chatMessages='))
-    if (messagesCookie) {
-      return JSON.parse(messagesCookie.split('=')[1]);
-    } else {
-      return {};
+    .split('; ')
+    .find(row => row.startsWith(`chatMessages-${room}=`))
+    if (messagesCookie && messagesCookie.length > 1) {
+      const chatMessages = messagesCookie.split('=')[1];
+      console.log("hay" , chatMessages);
+      return JSON.parse(chatMessages);
     }
+    return [];
   });
+
+
   const [optionChat, setOptionChat] = React.useState("no-remove");
   const [hasSelectedOption, setHasSelectedOption] = React.useState(true);
   const [selectedOption, setSelectedOption] = React.useState("no-remove");
@@ -24,12 +28,13 @@ function Chat({ socket, username, room, exitChat }) {
       .split('; ')
       .find(row => row.startsWith(`chatMessages-${room}=`))
     if (messagesCookie) {
+      console.log("hay" , messagesCookie);
       return JSON.parse(messagesCookie.split('=')[1]);
     } else {
+      console.log("no hay" ,messagesCookie);
       return [];
     }
   };
-
 
   const sendMessage = async () => {
     if (message === "") return;
@@ -39,7 +44,7 @@ function Chat({ socket, username, room, exitChat }) {
       (new Date(Date.now()).getMinutes() < 10
         ? "0" + new Date(Date.now()).getMinutes()
         : new Date(Date.now()).getMinutes());
-
+  
     const newMessage = {
       user: username,
       message: message,
@@ -47,13 +52,18 @@ function Chat({ socket, username, room, exitChat }) {
       time: time,
       id: messages.length,
     };
-
+  
     const selectOption = document.getElementById("message-input");
     selectOption.value = "";
     setMessage("");
     await socket.emit("new_message", newMessage);
-    setMessages((messages) => [...messages, newMessage]);
-    document.cookie = `chatMessages=${JSON.stringify(messages)}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/`;
+  
+    const roomMessagesCookie = `chatMessages-${room}`;
+    const roomMessages = getRoomMessages();
+    const updatedRoomMessages = [...roomMessages, newMessage];
+    setMessages(updatedRoomMessages);
+  
+    document.cookie = `${roomMessagesCookie}=${JSON.stringify(updatedRoomMessages)}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/`;
   };
 
   const disconnectChat = () => {
@@ -76,7 +86,11 @@ function Chat({ socket, username, room, exitChat }) {
     await socket.emit("update_selected_option", chatMode);
   };
 
-
+  React.useEffect(() => {
+    const messages = getRoomMessages();
+    setMessages(messages);
+  }, []);
+  
   React.useEffect(() => {
     const receiveMessage = (data) => {
       setMessages((messages) => [...messages, data]);

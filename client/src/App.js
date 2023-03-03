@@ -12,6 +12,7 @@ function App() {
   const [roomActive, setRoomActive] = useState(false)
 
   const joinRoom = () => {
+    if(room === "") return;
     socket.emit('join', {username,room});
     setRoomActive(true);
   }
